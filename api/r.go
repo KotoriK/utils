@@ -5,6 +5,6 @@ import (
 	"net/http"
 )
 
-func h(writter http.ResponseWriter, req *http.Request) {
+func Handler(writter http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(writter).Encode(req)
 }
