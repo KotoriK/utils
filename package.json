@@ -1,0 +1,36 @@
+{
+  "name": "utils-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "next",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KotoriK/util.git"
+  },
+  "author": "KotoriK",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KotoriK/util/issues"
+  },
+  "homepage": "https://github.com/KotoriK/util#readme",
+  "dependencies": {
+    "@material-ui/core": "^4.11.2",
+    "@mdx-js/loader": "^1.6.22",
+    "@next/mdx": "^10.0.3",
+    "github-markdown-css": "^4.0.0",
+    "mdx": "^0.3.1",
+    "next": "^10.0.3",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "typescript": "^4.1.3",
+    "@types/node": "^14.14.13"
+  }
+}
