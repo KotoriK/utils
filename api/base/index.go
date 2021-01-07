@@ -1,6 +1,7 @@
 package base64
 
 import (
+	"encoding/base32"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -12,20 +13,30 @@ type Result struct {
 	Data string `json:"data"`
 }
 
-func Base64Handler(w http.ResponseWriter, req *http.Request) {
+func Handler(w http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 	queryEncode := query.Get("encode")
 	queryDecode := query.Get("decode")
-
+	query32 := query.Get("b32") != ""
 	var result string
 	var err error
 	ok := false
 
 	if queryEncode != "" {
-		result = base64.StdEncoding.EncodeToString([]byte(queryEncode))
+		if query32 {
+			result = base32.StdEncoding.EncodeToString([]byte(queryEncode))
+
+		} else {
+			result = base64.StdEncoding.EncodeToString([]byte(queryEncode))
+		}
 	} else if queryDecode != "" {
 		var bytesArray []byte
-		bytesArray, err = base64.StdEncoding.DecodeString(queryDecode)
+		if query32 {
+			bytesArray, err = base32.StdEncoding.DecodeString(queryDecode)
+
+		} else {
+			bytesArray, err = base64.StdEncoding.DecodeString(queryDecode)
+		}
 		result = string(bytesArray[:])
 	} else {
 		w.WriteHeader(404)
@@ -41,5 +52,4 @@ func Base64Handler(w http.ResponseWriter, req *http.Request) {
 		Ok:   ok,
 		Data: result,
 	})
-
 }

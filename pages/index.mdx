@@ -3,13 +3,16 @@
 
 * **reflect**:[/api/reflect](./api/reflect)<br></br>
       返回你发送的HTTP请求。
-* **base64**:[/api/base64?(encode|decode)=(base64 format string)](./api/base64)<br></br>
-      解码你发送的base64
+* **base**:[/api/base64?(encode|decode)=(base64 format string)&b32=(any)](./api/base)<br></br>
+      解码/编码 base64/base32
+      若有传递b32参数且不为空，则使用base32进行编解码。否则使用base64
       返回格式:json {ok:boolean,data:string} ok指示是否成功，data包含结果或错误<br></br>
-      ex.1:[/api/base64?encode=114514](./api/base64?encode=114514)<br></br>
+      ex.1:[/api/base?encode=114514](./api/base?encode=114514)<br></br>
       returns {"ok":true,"data":"MTE0NTE0"}<br></br>
-      ex.2:[/api/base64?decode=QWNyb3NzIHRoZSBHcmVhdCBXYWxsIHdlIGNhbiByZWFjaCBldmVyeSBjb3JuZXIgaW4gdGhlIHdvcmxkLg==](./api/base64?decode=QWNyb3NzIHRoZSBHcmVhdCBXYWxsIHdlIGNhbiByZWFjaCBldmVyeSBjb3JuZXIgaW4gdGhlIHdvcmxkLg==)<br></br>
+      ex.2:[/api/base?decode=QWNyb3NzIHRoZSBHcmVhdCBXYWxsIHdlIGNhbiByZWFjaCBldmVyeSBjb3JuZXIgaW4gdGhlIHdvcmxkLg==](./api/base?decode=QWNyb3NzIHRoZSBHcmVhdCBXYWxsIHdlIGNhbiByZWFjaCBldmVyeSBjb3JuZXIgaW4gdGhlIHdvcmxkLg==)<br></br>
       returns {"ok":true,"data":"Across the Great Wall we can reach every corner in the world."}
+      ex.3:[/api/base?encode=114514&b32=1](./api/base?encode=114514&b32=1)<br></br>
+      returns {"ok":true,"data":"GEYTINJRGQ======"}<br></br>
 * **thunder**:[/api/thunder?q=(string)](./api/thunder)<br></br>
       解码你发送的thunder链接。
       返回格式:json {ok:boolean,data:string} ok指示是否成功，data包含结果或错误
