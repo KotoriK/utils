@@ -2,7 +2,7 @@ import { Container, makeStyles, Paper, CssBaseline } from "@material-ui/core";
 import Head from "next/head";
 import useHorse from "../compo/horse";
 
-import '../node_modules/github-markdown-css/github-markdown.css'
+import '../../node_modules/github-markdown-css/github-markdown.css'
 const useStyles = makeStyles(theme => {
     return {
         gap: {
