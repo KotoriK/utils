@@ -9,22 +9,24 @@ export default async function (req: VercelRequest, res: VercelResponse) {
 
     if (typeof url == 'string') {
         console.log(url)
-            const timeBeforeReq = performance.now()
-            await fetch(url).then(async resp => {
-                const timeAfterReq = performance.now()
-                const { status, statusText, headers, redirected, type } = resp
-                data = {
-                    status,
-                    statusText,
-                    headers,
-                    redirected,
-                    type,
-                    time: timeAfterReq - timeBeforeReq
-                }
+        const timeBeforeReq = performance.now()
+        await fetch(url).then(async resp => {
+            const timeAfterReq = performance.now()
+            const { status, statusText, headers, redirected, type, url } = resp
+            data = {
+                status,
+                statusText,
+                headers,
+                redirected,
+                type,
+                url,
+                time: timeAfterReq - timeBeforeReq
+            }
+            isOK = true
+        })
+            .catch(e => {
+                data = { type: 'error', error: e }
             })
-                .catch(e => {
-                    data = { type: 'error', error: e }
-                })
     } else {
         data = `malform url. Expect string, but get ${typeof url}`
     }
