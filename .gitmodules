@@ -1,0 +1,3 @@
+[submodule "vendor/doh-lookup"]
+	path = vendor/doh-lookup
+	url = https://github.com/KotoriK/doh-lookup/
