@@ -1,7 +1,8 @@
-import { NowRequest, NowResponse } from '@vercel/node'
+import { VercelRequest, VercelResponse } from '@vercel/node'
 import { APIResult } from '../../src/api'
 import { performance } from 'perf_hooks'
-export default async function (req: NowRequest, res: NowResponse) {
+import fetch from 'node-fetch'
+export default async function (req: VercelRequest, res: VercelResponse) {
     const { url } = req.query
     let isOK = false
     let data
@@ -12,14 +13,12 @@ export default async function (req: NowRequest, res: NowResponse) {
             await fetch(url).then(async resp => {
                 const timeAfterReq = performance.now()
                 const { status, statusText, headers, redirected, type } = resp
-                const trailer = await resp.trailer
                 data = {
                     status,
                     statusText,
                     headers,
                     redirected,
                     type,
-                    trailer,
                     time: timeAfterReq - timeBeforeReq
                 }
             })
