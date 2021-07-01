@@ -1,9 +1,9 @@
-import { NowRequest, NowResponse } from '@vercel/node'
+import {  VercelRequest,  VercelResponse } from '@vercel/node'
 import { APIResult } from '../../src/api'
 import urlencode from 'urlencode'
 
 
-export default function (req: NowRequest, res: NowResponse) {
+export default function (req: VercelRequest, res: VercelResponse) {
     const { charset = 'utf8', s } = req.query
     let isOK = false
     let data
