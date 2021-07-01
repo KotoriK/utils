@@ -58,5 +58,5 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     } else {
         data = 'argument miss: "url"'
     }
-    res.send(`{ok:${ok ? 'true' : 'false'},data:${data}}`);
+    res.send(`{"ok":${ok ? 'true' : 'false'},"data":${data}}`);
 }
