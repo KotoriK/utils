@@ -99,11 +99,11 @@ func Query(dns_domain string, name string, record_type string, do bool, cd bool)
 	}
 }
 func ParseTypeInQueryAnswer(answer QueryAnswer) QueryAnswerWithStringType {
-	type_str, _ := ParseType(answer.Type)
+	type_str, _ := DecodeType(answer.Type)
 	return QueryAnswerWithStringType{
 		answer.Name, type_str, answer.TTL, answer.Data}
 }
-func ParseType(type_num int) (string, error) {
+func DecodeType(type_num int) (string, error) {
 	switch type_num {
 	case 1:
 		return "A", nil
@@ -119,6 +119,25 @@ func ParseType(type_num int) (string, error) {
 		return "AAAA", nil
 	default:
 		return "", errors.New("unknown type")
+	}
+}
+
+func EncodeType(type_string string) (int, error) {
+	switch type_string {
+	case "A":
+		return 1, nil
+	case "NS":
+		return 2, nil
+	case "CNAME":
+		return 5, nil
+	case "SOA":
+		return 6, nil
+	case "TXT":
+		return 16, nil
+	case "AAAA":
+		return 28, nil
+	default:
+		return 0, errors.New("unknown type")
 	}
 }
 
@@ -145,18 +164,25 @@ func Handler(writter http.ResponseWriter, req *http.Request) {
 	} else {
 		dns_domain = _record_type
 	}
-
-	result, err := Query(dns_domain, name, record_type, true, false)
 	var res Result
+	type_int, err := EncodeType(dns_domain)
 	if err != nil {
-		res = Result{
-			Ok:   true,
-			Data: result,
-		}
-	} else {
 		res = Result{
 			Ok:   false,
 			Data: err,
+		}
+	} else {
+		result, err := Query(strconv.Itoa(type_int), name, record_type, true, false)
+		if err != nil {
+			res = Result{
+				Ok:   true,
+				Data: result,
+			}
+		} else {
+			res = Result{
+				Ok:   false,
+				Data: err,
+			}
 		}
 	}
 	json.NewEncoder(writter).Encode(res)
