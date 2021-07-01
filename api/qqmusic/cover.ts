@@ -2,6 +2,21 @@ import { VercelResponse, VercelRequest } from '@vercel/node'
 
 import Cheerio from 'cheerio'
 import fetch from 'node-fetch'
+import Sagiri from 'sagiri'
+import { searchByUrl } from 'ascii2d'
+export async function saucenao(pic: string) {
+    const results = await Sagiri(process.env.SAUCENAO_API)(pic)
+    let ok = false//saucenao直接根据相似度判断是否成功
+    for (const result of results) {
+        if (result.similarity > 0.6) {
+            ok = true
+            break
+        }
+    }
+    return {
+        ok, results,from:"pixiv"
+    }
+}
 export default async function (req: VercelRequest, res: VercelResponse) {
     let ok = false
     let data = ''
@@ -16,15 +31,22 @@ export default async function (req: VercelRequest, res: VercelResponse) {
                 const listName = $("#p_name_show").text()
                 const listAuthor = $(".data__cont .data__singer > a").text()
                 const coverImg = $('.data__cover > .data__photo').attr().src
+                ok = true
+                const data_obj = {
+                    listName,
+                    listAuthor,
+                    coverImg,
+                    search:[]
+                }
                 if (search) {
-
+                    const result = await saucenao(coverImg)
+                    if (result.ok) {
+                        data_obj.search.push(result)
+                    }else{
+                        data_obj.search.push({...searchByUrl(coverImg,'color',false),from:"ascii2d"})
+                    }
                 } else {
-                    ok = true
-                    data = JSON.stringify({
-                        listName,
-                        listAuthor,
-                        coverImg
-                    })
+                    data = JSON.stringify(data_obj)
                 }
             } else {
                 data = 'fetch failed:' + resp.status
