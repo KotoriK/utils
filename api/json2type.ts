@@ -9,10 +9,10 @@ export default async function (req: VercelRequest, res: VercelResponse) {
         if (url) {
             const resp = await fetch(url as any)
             const txt = await resp.text()
-            data = parseToTypes(txt, name)
+            data = parseToTypes(txt, name as any)
         } else {
             if (json) {
-                data = parseToTypes(json, name)
+                data = parseToTypes(json as any, name as any)
             } else {
                 data = "miss argument"
             }
