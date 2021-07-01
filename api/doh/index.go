@@ -130,7 +130,7 @@ type Result struct {
 func Handler(writter http.ResponseWriter, req *http.Request) {
 	query := req.URL.Query()
 	var dns_domain string
-	_dns_domain := query.Get("name")
+	_dns_domain := query.Get("dns_domain")
 	if _dns_domain == "" {
 		dns_domain = "cloudflare-dns.com"
 	} else {
@@ -139,7 +139,7 @@ func Handler(writter http.ResponseWriter, req *http.Request) {
 	name := query.Get("name")
 
 	var record_type string
-	_record_type := query.Get("name")
+	_record_type := query.Get("record_type")
 	if _record_type == "" {
 		dns_domain = "AAAA"
 	} else {
