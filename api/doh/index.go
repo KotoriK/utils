@@ -178,6 +178,7 @@ func Handler(writter http.ResponseWriter, req *http.Request) {
 				Ok:   true,
 				Data: result,
 			}
+			writter.Header().Add("Cache-Control", "s-maxage=60")
 		} else {
 			res = Result{
 				Ok:   false,
