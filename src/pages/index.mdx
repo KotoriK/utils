@@ -3,6 +3,9 @@
 
 * **reflect**:[/api/reflect](./api/reflect)<br></br>
       返回你发送的HTTP请求。
+* **callme**:[/api/callme?url=(string)](./api/callme?url=https://www.baidu.com)<br></br>
+      返回从Vercel服务器到指定的URL的往返时间(单位:ms)，以及指定URL的响应。
+      返回格式:json {ok:boolean,data:any} ok指示是否成功，data包含结果或错误
 * **base**:[/api/base64?(encode|decode)=(base64 format string)&b32=(any)](./api/base)<br></br>
       解码/编码 base64/base32
       若有传递b32参数且不为空，则使用base32进行编解码。否则使用base64
@@ -19,6 +22,7 @@
 * **url**:[/api/url?s=(string)&charset?=(charset,default "utf8")](./api/url)<br></br>
       解码你发送的urlencode字符串。
       返回格式:json {ok:boolean,data:string} ok指示是否成功，data包含结果或错误
-* **callme**:[/api/callme?url=(string)](./api/callme?url=https://www.baidu.com)<br></br>
-      返回从Vercel服务器到指定的URL的往返时间(单位:ms)，以及指定URL的响应。
-      返回格式:json {ok:boolean,data:any} ok指示是否成功，data包含结果或错误
+* **qqmusic/cover**:[/api/qqmusic/cover?url=(string)&search?=(boolean)](./api/qqmusic/cover)<br></br>
+      找到QQ音乐歌单的封面，并一键搜索。
+      **注意：**需要设置<code>search</code>才会自动搜图。
+      返回格式:json {ok:boolean,data:Object}ok指示是否成功，data包含结果或错误
