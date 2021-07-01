@@ -186,5 +186,6 @@ func Handler(writter http.ResponseWriter, req *http.Request) {
 			}
 		}
 	}
+	writter.Header().Add("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(writter).Encode(res)
 }

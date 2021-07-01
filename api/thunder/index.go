@@ -40,6 +40,7 @@ func ThunderHandler(w http.ResponseWriter, req *http.Request) {
 	printResult(w, ok, result)
 }
 func printResult(w http.ResponseWriter, ok bool, result string) {
+	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(w).Encode(Result{
 		Ok:   ok,
 		Data: result,

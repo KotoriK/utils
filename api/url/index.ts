@@ -21,7 +21,7 @@ export default function (req: VercelRequest, res: VercelResponse) {
     }else{
         data = "data undefined"
     }
-    
+    res.setHeader("Content-Type","application/json; charset=utf-8")
     res.setHeader("Cache-Control", "s-maxage=60")
     res.send(JSON.stringify({
         ok: isOK, data

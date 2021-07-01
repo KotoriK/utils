@@ -40,5 +40,6 @@ func ReflectHandler(writter http.ResponseWriter, req *http.Request) {
 		Proto:   req.Proto,
 		Trailer: req.Trailer,
 	}
+	writter.Header().Add("Content-Type", "application/json; charset=utf-8")
 	json.NewEncoder(writter).Encode(res)
 }

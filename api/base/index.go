@@ -47,6 +47,7 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 	} else {
 		ok = true
 	}
+	w.Header().Add("Content-Type", "application/json; charset=utf-8")
 	w.Header().Add("Cache-Control", "s-maxage=60")
 	json.NewEncoder(w).Encode(Result{
 		Ok:   ok,
