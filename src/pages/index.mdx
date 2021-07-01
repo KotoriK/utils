@@ -16,11 +16,10 @@
       returns {"ok":true,"data":"Across the Great Wall we can reach every corner in the world."}
       ex.3:[/api/base?encode=114514&b32=1](./api/base?encode=114514&b32=1)<br></br>
       returns {"ok":true,"data":"GEYTINJRGQ======"}<br></br>
-* **doh**:[/api/doh?name=(string)&dns_domain=(string, default "cloudflare-dns.com")&record_type=](./api/doh)
+* **doh**:[/api/doh?name=(string)&dns_domain=(string, default "cloudflare-dns.com")&record_type=(string, default "AAAA")](./api/doh)
       执行DNS查询
       返回格式: json {ok:boolean,data:Object}
-      ex.1:[/api/base?encode=114514](./api/base?encode=114514)<br></br>
-      
+      ex.1:[/api/doh?name=google.com&type=AAAA](./api/doh?name=google.com&type=AAAA)<br></br>
 * **thunder**:[/api/thunder?q=(string)](./api/thunder)<br></br>
       解码你发送的thunder链接。
       返回格式:json {ok:boolean,data:string} ok指示是否成功，data包含结果或错误
