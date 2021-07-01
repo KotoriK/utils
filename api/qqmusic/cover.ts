@@ -46,6 +46,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
                         data_obj.search.push({ ...await searchByUrl(coverImg, 'color', false), from: "ascii2d" })
                     }
                 }
+                res.setHeader("Cache-Control", "s-maxage=7200")
                 data = JSON.stringify(data_obj)
             } else {
                 data = 'fetch failed:' + resp.status
