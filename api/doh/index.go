@@ -169,7 +169,7 @@ func Handler(writter http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		res = Result{
 			Ok:   false,
-			Data: err,
+			Data: err.Error(),
 		}
 	} else {
 		result, err := Query(strconv.Itoa(type_int), name, record_type, true, false)
@@ -182,7 +182,7 @@ func Handler(writter http.ResponseWriter, req *http.Request) {
 		} else {
 			res = Result{
 				Ok:   false,
-				Data: err,
+				Data: err.Error(),
 			}
 		}
 	}
