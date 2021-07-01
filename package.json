@@ -26,6 +26,7 @@
     "ascii2d": "github:KotoriK/ascii2d",
     "cheerio": "^1.0.0-rc.10",
     "github-markdown-css": "^4.0.0",
+    "json2type": "github:KotoriK/json2type",
     "mdx": "^0.3.1",
     "next": "^11.0.1",
     "node-fetch": "^2.6.1",
