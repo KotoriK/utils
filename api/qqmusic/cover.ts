@@ -14,7 +14,7 @@ export async function saucenao(pic: string) {
         }
     }
     return {
-        ok, results,from:"pixiv"
+        ok, results, from: "pixiv"
     }
 }
 export default async function (req: VercelRequest, res: VercelResponse) {
@@ -36,18 +36,17 @@ export default async function (req: VercelRequest, res: VercelResponse) {
                     listName,
                     listAuthor,
                     coverImg,
-                    search:[]
+                    search: []
                 }
                 if (search) {
                     const result = await saucenao(coverImg)
                     if (result.ok) {
                         data_obj.search.push(result)
-                    }else{
-                        data_obj.search.push({...searchByUrl(coverImg,'color',false),from:"ascii2d"})
+                    } else {
+                        data_obj.search.push({ ...await searchByUrl(coverImg, 'color', false), from: "ascii2d" })
                     }
-                } else {
-                    data = JSON.stringify(data_obj)
                 }
+                data = JSON.stringify(data_obj)
             } else {
                 data = 'fetch failed:' + resp.status
             }
