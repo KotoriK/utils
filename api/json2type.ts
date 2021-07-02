@@ -1,5 +1,4 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
-//@ts-ignore
 import { parseToTypes } from 'json2type'
 import fetch from "node-fetch";
 export default async function (req: VercelRequest, res: VercelResponse) {
