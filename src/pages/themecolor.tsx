@@ -1,11 +1,23 @@
-import { Button, Container, Grid, Toolbar, makeStyles, Typography, Divider, Card, Slider } from '@material-ui/core'
-import { ChangeEventHandler, useCallback, useRef, useState } from 'react'
+import { Button, Container, Grid, Toolbar, makeStyles, Typography, Divider, Card, Slider, Switch, FormControlLabel, CircularProgress, Fade } from '@material-ui/core'
+import { ChangeEventHandler, useCallback, useEffect, useRef, useState } from 'react'
 import { createStyles } from '@material-ui/core'
-import { kmeans, readImage, toPixel, KMeansResult } from 'palette'
+import { kmeans, readImage, toPixel, KMeansResult, readImageDownsampling } from 'palette'
 import GitHubIcon from '@material-ui/icons/GitHub';
 import Placeholder from '../compo/placeholder'
 import Color from '../compo/color'
 import Link from 'next/link'
+import PromiseWorker from 'promise-worker';
+function useThemeColorWorker() {
+    const promiseWorker = useRef<PromiseWorker>()
+    useEffect(() => {
+        const worker = new Worker(new URL('../ThemeColorWorker.ts', import.meta.url))
+        promiseWorker.current = new PromiseWorker(worker)
+        return () => {
+            worker.terminate()
+        }
+    }, [])
+    return promiseWorker.current
+}
 const useStyles = makeStyles((theme) => createStyles({
     "color": {
         height: '3vh',
@@ -57,9 +69,13 @@ type ThemeColorStateResult = Pick<KMeansResult, 'iterate_time' | 'cluster_center
 export default function ThemeColor() {
     const [currentImageUrl, setImageBlobUrl] = useState<string>('')
     const [result, setResult] = useState<ThemeColorStateResult>()
+    const [doDownSample, setDoDownSample] = useState(true)
+    const [kMeansSetting_k,setKMeansSetting_k] = useState(defaultKSetting.k)
+    const [kMeansSetting_iteration,setKMeansSetting_iteration] = useState(defaultKSetting.iteration)
     const refImageInput = useRef<HTMLInputElement>()
     const refImageElement = useRef<HTMLImageElement>()
-    const refKMeansSetting = useRef<KMeansSetting>(defaultKSetting)
+    const themeColorWorker = useThemeColorWorker()
+    const [inProgress, setInProgress] = useState(false)
     const changeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
         async () => {
             const files = refImageInput.current.files
@@ -69,30 +85,33 @@ export default function ThemeColor() {
                 setImageBlobUrl(URL.createObjectURL(buf))
             }
         }, [refImageInput])
-    const clickHandler = useCallback(() => {
-        //TODO:Worker
+    const clickHandler = useCallback(async () => {
         const { current } = refImageElement
-        const pixels = toPixel(readImage(current))
-        const { k, iteration } = refKMeansSetting.current
-        const result: any = kmeans(pixels, k, iteration)
+        const data = doDownSample ? readImageDownsampling(current, 10 * 1000) : readImage(current)
+        setInProgress(true)
+        const result: any = await themeColorWorker.postMessage({
+            k:kMeansSetting_k,iteration:kMeansSetting_iteration,
+            img: data
+        })
         const { size } = result
-        console.log(result)
         result.label = (result as KMeansResult).label.map(value => (value / size * 100).toFixed(2) + '%')
         setResult(result)
-    }, [refImageElement, refKMeansSetting])
+        setInProgress(false)
+    }, [refImageElement, kMeansSetting_k,kMeansSetting_iteration, doDownSample, themeColorWorker])
     const kChangeHandler = useCallback((_, value) => {
-        const { current } = refKMeansSetting
-        current.k = value
-    }, [refKMeansSetting])
+        setKMeansSetting_k(value)
+    }, [])
     const iterationChangeHandler = useCallback((_, value) => {
-        const { current } = refKMeansSetting
-        current.iteration = value
-    }, [refKMeansSetting])
+        setKMeansSetting_iteration(value)
+    }, [])
     const styles = useStyles()
+    const doDownSampleChangeHandler = useCallback((_, v) => {
+        setDoDownSample(v)
+    }, [])
     return <>
         <Toolbar>
-            <Link href="/">    
-                    <Button color="primary">{"< 返回"}</Button>
+            <Link href="/">
+                <Button color="primary">{"< 返回"}</Button>
             </Link>
         </Toolbar>
         <Container>
@@ -107,7 +126,13 @@ export default function ThemeColor() {
                             <Typography variant="h5">选择图像</Typography>
                             <Divider />
                             <input ref={refImageInput} id="image" type="file" accept="image/*" onChange={changeHandler}></input>
-                            <Button variant="outlined" color="primary" onClick={clickHandler}>执行</Button>
+                            <Button variant="outlined" color="primary" onClick={clickHandler} disabled={inProgress}>执行</Button><Fade
+                                in={inProgress}
+                                unmountOnExit
+                                timeout={800}
+                            >
+                                <CircularProgress size={18} />
+                            </Fade>
                             <Typography variant="subtitle1">当前图像</Typography>
                             <Placeholder className={styles.preview} caption="暂无预览" >
                                 {currentImageUrl ? <img ref={refImageElement} className={styles.preview} src={currentImageUrl}></img> : null}
@@ -128,7 +153,7 @@ export default function ThemeColor() {
                                     step={1}
                                     min={KMeansSetting_iteration_range[0]}
                                     max={KMeansSetting_iteration_range[KMeansSetting_iteration_range.length - 1]}
-                                    defaultValue={defaultKSetting.iteration}
+                                    value={kMeansSetting_iteration}
                                     aria-labelledby="label-iteration"
                                     valueLabelDisplay="auto"
                                     marks={KMeansSetting_iteration_marks}
@@ -141,13 +166,24 @@ export default function ThemeColor() {
                                     step={1}
                                     min={KMeansSetting_k_range[0]}
                                     max={KMeansSetting_k_range[KMeansSetting_k_range.length - 1]}
-                                    defaultValue={defaultKSetting.k}
+                                    value={kMeansSetting_k}
                                     aria-labelledby="label-k"
                                     valueLabelDisplay="auto"
                                     marks={KMeansSetting_k_marks}
                                     onChange={kChangeHandler}
                                 ></Slider>
                             </span>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={doDownSample}
+                                        onChange={doDownSampleChangeHandler}
+                                        name="checkedB"
+                                        color="primary"
+                                    />
+                                }
+                                label="开启降采样"
+                            />
                         </Container>
                     </Card>
                 </Grid>
