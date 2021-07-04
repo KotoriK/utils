@@ -8,13 +8,13 @@ export default function useHorse() {
         let isHidden = document.visibilityState == "hidden"
         if (isHidden) {
             sleep(1500).then(() => {
-                document.title = '.'
+                document.title = '🐴'
             })
             .then(async()=>{
                 let count = 0
                 const addHorse = async() => {
                     if (document.visibilityState == "hidden" ) {
-                        if(count<10){
+                        if(count<9){
                            document.title += HORSE
                         count++
                         await sleep(1000)
