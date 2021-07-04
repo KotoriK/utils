@@ -66,48 +66,47 @@ const KMeansSetting_k_marks = KMeansSetting_k_range.map(_mapRange)
 const KMeansSetting_iteration_marks = KMeansSetting_iteration_range.map(_mapRange)
 
 type ThemeColorStateResult = Pick<KMeansResult, 'iterate_time' | 'cluster_center' | 'fit_thresold' | 'size'> & { label: string[] }
+
+function useControlledValue<T>(initialValue?: T) {
+    const [value, set] = useState(initialValue)
+    const cb = useCallback((_, next:T) => {
+        set(next)
+    }, [])
+    return [value,cb] as [T,(_: any, next: T) => void]
+}
 export default function ThemeColor() {
     const [currentImageUrl, setImageBlobUrl] = useState<string>('')
     const [result, setResult] = useState<ThemeColorStateResult>()
-    const [doDownSample, setDoDownSample] = useState(true)
-    const [kMeansSetting_k,setKMeansSetting_k] = useState(defaultKSetting.k)
-    const [kMeansSetting_iteration,setKMeansSetting_iteration] = useState(defaultKSetting.iteration)
-    const refImageInput = useRef<HTMLInputElement>()
+    const [doDownSample, setDoDownSample] = useControlledValue(true)
+    const [kMeansSetting_k, setKMeansSetting_k] = useControlledValue(defaultKSetting.k)
+    const [kMeansSetting_iteration, setKMeansSetting_iteration] = useControlledValue(defaultKSetting.iteration)
     const refImageElement = useRef<HTMLImageElement>()
     const themeColorWorker = useThemeColorWorker()
     const [inProgress, setInProgress] = useState(false)
-    const changeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
-        async () => {
-            const files = refImageInput.current.files
+    const changeImage = useCallback<ChangeEventHandler<HTMLInputElement>>(
+        async (e) => {
+            const files = e.target.files
             if (files && files.length > 0) {
                 const buf = new Blob([await files[0].arrayBuffer()])
                 if (currentImageUrl) URL.revokeObjectURL(currentImageUrl)
                 setImageBlobUrl(URL.createObjectURL(buf))
             }
-        }, [refImageInput])
-    const clickHandler = useCallback(async () => {
+        }, [])
+    const execute = useCallback(async () => {
         const { current } = refImageElement
         const data = doDownSample ? readImageDownsampling(current, 10 * 1000) : readImage(current)
         setInProgress(true)
         const result: any = await themeColorWorker.postMessage({
-            k:kMeansSetting_k,iteration:kMeansSetting_iteration,
+            k: kMeansSetting_k, iteration: kMeansSetting_iteration,
             img: data
         })
         const { size } = result
         result.label = (result as KMeansResult).label.map(value => (value / size * 100).toFixed(2) + '%')
         setResult(result)
         setInProgress(false)
-    }, [refImageElement, kMeansSetting_k,kMeansSetting_iteration, doDownSample, themeColorWorker])
-    const kChangeHandler = useCallback((_, value) => {
-        setKMeansSetting_k(value)
-    }, [])
-    const iterationChangeHandler = useCallback((_, value) => {
-        setKMeansSetting_iteration(value)
-    }, [])
+    }, [refImageElement, kMeansSetting_k, kMeansSetting_iteration, doDownSample, ])
     const styles = useStyles()
-    const doDownSampleChangeHandler = useCallback((_, v) => {
-        setDoDownSample(v)
-    }, [])
+
     return <>
         <Toolbar>
             <Link href="/">
@@ -125,8 +124,8 @@ export default function ThemeColor() {
                         <Container className={styles.has_vertical_gap}>
                             <Typography variant="h5">选择图像</Typography>
                             <Divider />
-                            <input ref={refImageInput} id="image" type="file" accept="image/*" onChange={changeHandler}></input>
-                            <Button variant="outlined" color="primary" onClick={clickHandler} disabled={inProgress}>执行</Button><Fade
+                            <input id="image" type="file" accept="image/*" onChange={changeImage}></input>
+                            <Button variant="outlined" color="primary" onClick={execute} disabled={inProgress}>执行</Button><Fade
                                 in={inProgress}
                                 unmountOnExit
                                 timeout={800}
@@ -157,7 +156,7 @@ export default function ThemeColor() {
                                     aria-labelledby="label-iteration"
                                     valueLabelDisplay="auto"
                                     marks={KMeansSetting_iteration_marks}
-                                    onChange={iterationChangeHandler}
+                                    onChange={setKMeansSetting_iteration}
                                 ></Slider>
                             </span>
                             <span>
@@ -170,14 +169,14 @@ export default function ThemeColor() {
                                     aria-labelledby="label-k"
                                     valueLabelDisplay="auto"
                                     marks={KMeansSetting_k_marks}
-                                    onChange={kChangeHandler}
+                                    onChange={setKMeansSetting_k}
                                 ></Slider>
                             </span>
                             <FormControlLabel
                                 control={
                                     <Switch
                                         checked={doDownSample}
-                                        onChange={doDownSampleChangeHandler}
+                                        onChange={setDoDownSample}
                                         name="checkedB"
                                         color="primary"
                                     />
