@@ -21,5 +21,7 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     } catch (error) {
         data = error
     }
+    res.setHeader("Content-Type", "application/json; charset=utf-8")
+    if (ok) res.setHeader("Cache-Control", "s-maxage=60")
     res.send(`{"ok":${ok ? 'true' : 'false'},"data":"${data}}"`)
 }
