@@ -6,7 +6,7 @@
 * **reflect**:[/api/reflect](./api/reflect)<br></br>
       返回你发送的HTTP请求。
 * **callme**:[/api/callme?url=(string)](./api/callme?url=https://www.baidu.com)<br></br>
-      返回从Vercel服务器到指定的URL的往返时间(单位:ms)，以及指定URL的响应。
+      返回从Vercel服务器到指定的URL的往返时间(单位:ms)，以及指定URL的响应。<br></br>
       返回格式:json {ok:boolean,data:any} ok指示是否成功，data包含结果或错误
 * **base**:[/api/base64?(encode|decode)=(base64 format string)&b32=(any)](./api/base)<br></br>
       解码/编码 base64/base32
@@ -20,7 +20,7 @@
       returns {"ok":true,"data":"GEYTINJRGQ======"}<br></br>
 * **doh**:[/api/doh?name=(string)&dns_domain=(string, default "cloudflare-dns.com")&record_type=(string, default "AAAA")](./api/doh)
       执行DNS查询
-      返回格式: json {ok:boolean,data:Object}
+      返回格式: json {ok:boolean,data:Object}<br></br>
       ex.1:[/api/doh?name=google.com&type=AAAA](./api/doh?name=google.com&type=AAAA)<br></br>
 * **thunder**:[/api/thunder?q=(string)](./api/thunder)<br></br>
       解码你发送的thunder链接。
@@ -32,3 +32,7 @@
       找到QQ音乐歌单的封面，并一键搜索。
       **注意：**需要设置<code>search</code>才会自动搜图。
       返回格式:json {ok:boolean,data:Object}ok指示是否成功，data包含结果或错误
+* **json2type**:[/api/json2type?url=(string)|json=(string)&name=(string, optional)](./api/json2type)<br></br>
+      根据API返回的JSON生成对应的TypeScript类型声明
+      返回格式: json {ok:boolean,data:Object}<br></br>
+      ex.1:[./api/json2type?url=https://utils-kotorik.vercel.app/api/callme?url=https://www.baidu.com](./api/json2type?url=https://utils-kotorik.vercel.app/api/callme?url=https://www.baidu.com)
