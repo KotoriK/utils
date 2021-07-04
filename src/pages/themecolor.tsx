@@ -1,7 +1,7 @@
 import { Button, Container, Grid, Toolbar, makeStyles, Typography, Divider, Card, Slider, Switch, FormControlLabel, CircularProgress, Fade } from '@material-ui/core'
-import { ChangeEventHandler, useCallback, useEffect, useRef, useState } from 'react'
+import { ChangeEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createStyles } from '@material-ui/core'
-import { kmeans, readImage, toPixel, KMeansResult, readImageDownsampling } from 'palette'
+import { readImage, KMeansResult, readImageDownsampling, normalizeRGBA, rgbaToHSLA, sortHSL } from 'palette'
 import GitHubIcon from '@material-ui/icons/GitHub';
 import Placeholder from '../compo/placeholder'
 import Color from '../compo/color'
@@ -26,9 +26,6 @@ const useStyles = makeStyles((theme) => createStyles({
     vgap: {
         height: 20
     },
-    "2x_vgap": {
-        height: 40
-    },
     "has_vertical_gap": {
         marginTop: 15,
         marginBottom: 12
@@ -50,6 +47,13 @@ const useStyles = makeStyles((theme) => createStyles({
                 textDecoration: 'underline',
             }
         }
+    },
+    "result": {
+        display:"flex",
+        "& span": {
+            marginLeft: 8,
+
+        }
     }
 }))
 const defaultKSetting = {
@@ -69,10 +73,10 @@ type ThemeColorStateResult = Pick<KMeansResult, 'iterate_time' | 'cluster_center
 
 function useControlledValue<T>(initialValue?: T) {
     const [value, set] = useState(initialValue)
-    const cb = useCallback((_, next:T) => {
+    const cb = useCallback((_, next: T) => {
         set(next)
     }, [])
-    return [value,cb] as [T,(_: any, next: T) => void]
+    return [value, cb] as [T, (_: any, next: T) => void]
 }
 export default function ThemeColor() {
     const [currentImageUrl, setImageBlobUrl] = useState<string>('')
@@ -104,9 +108,23 @@ export default function ThemeColor() {
         result.label = (result as KMeansResult).label.map(value => (value / size * 100).toFixed(2) + '%')
         setResult(result)
         setInProgress(false)
-    }, [refImageElement, kMeansSetting_k, kMeansSetting_iteration, doDownSample, ])
+    }, [refImageElement, kMeansSetting_k, kMeansSetting_iteration, doDownSample, themeColorWorker])
     const styles = useStyles()
-
+    const mappedResult = useMemo(() =>
+        result && <>
+            <div className={styles.result}>
+            <Typography component="span" variant="subtitle1"><strong>像素个数：</strong>{result.size}</Typography>
+            <Typography component="span"  variant="subtitle1"><strong>达到拟合要求：</strong>{result.fit_thresold ? "是" : "否"}</Typography>
+            <Typography component="span" variant="subtitle1"><strong>迭代次数：{result.iterate_time}</strong></Typography>
+            </div>
+            <br/>
+            {result.cluster_center.map(v => [v, rgbaToHSLA(normalizeRGBA(v))])
+                .sort((a, b) => sortHSL([2, 0, 1, 3])(a[1], b[1]))
+                .map(([pixel, _], index) => <Grid key={index} item>
+                    <Color color={pixel} className={styles.color} percent={result.label[index]}></Color>
+                </Grid>)}
+        </>
+        , [result])
     return <>
         <Toolbar>
             <Link href="/">
@@ -145,7 +163,7 @@ export default function ThemeColor() {
                         <Container className={styles.has_vertical_gap}>
                             <Typography variant="h5">参数调整</Typography>
                             <Divider />
-                            <div className={styles['2x_vgap']}></div>
+                            <div className={styles.vgap}></div>
                             <span >
                                 <Typography component="span" id="label-iteration" variant="subtitle1">迭代次数:</Typography>
                                 <Slider
@@ -192,9 +210,7 @@ export default function ThemeColor() {
                             <Typography variant="h5">结果</Typography>
                             <Divider />
                             <Grid container spacing={2} className={styles.has_vertical_gap}>
-                                {result.cluster_center.map((pixel, index) => <Grid key={index} item>
-                                    <Color color={pixel} className={styles.color} percent={result.label[index]}></Color>
-                                </Grid>)}
+                                {mappedResult}
                             </Grid>
                         </Container>
                     </Card>
